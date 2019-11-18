@@ -8,6 +8,14 @@ const hbs          = require('hbs');
 const mongoose     = require('mongoose');
 const logger       = require('morgan');
 const path         = require('path');
+const passport     = require('./passport/passport');
+const flash        = require('flash');
+const session      = require("express-session");
+
+const courses = require('./routes/courses');
+const index = require('./routes/index');
+const users = require('./routes/users');
+
 
 
 mongoose
@@ -21,7 +29,6 @@ mongoose
 
 const app_name = require('./package.json').name;
 const debug = require('debug')(`${app_name}:${path.basename(__filename).split('.')[0]}`);
-
 const app = express();
 
 // Middleware Setup
@@ -30,8 +37,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Express View engine setup
+// Middleware Setup 2
 
+app.use(flash());
+app.use(
+ session({
+   secret: "our-passport-local-strategy-app",
+   resave: true,
+   saveUninitialized: true
+ })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Express View engine setup
 app.use(require('node-sass-middleware')({
   src:  path.join(__dirname, 'public'),
   dest: path.join(__dirname, 'public'),
@@ -50,13 +70,8 @@ app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 app.locals.title = 'ALUMHACK FINAL EDITION MASTER CHALLENGE';
 
 
-const index = require('./routes/index');
 app.use('/', index);
-
-const users = require('./routes/users');
 app.use('/users', users);
-
-const courses = require('./routes/courses');
 app.use('/courses', courses);
 
 

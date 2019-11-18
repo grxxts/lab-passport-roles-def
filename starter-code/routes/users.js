@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const users = require("../models/User");
 
+const localStrategy = require("passport-local").Strategy;
+const ensureLogin = require("connect-ensure-login");
+
 /* GET home page */
 router.get('/', (req, res, next) => {
   users.find()
@@ -10,10 +13,21 @@ router.get('/', (req, res, next) => {
     })
 });
 
-router.get('/:id', (req, res, next) => {
+
+
+router.get('/:id', ensureLogin.ensureLoggedIn(), (req, res, next) => {
   users.findOne({ _id: req.params.id })
     .then((userFound) => {
-      res.render('users/show', userFound)
+      console.log(userFound)
+      if(userFound.role === "TA"){
+        res.render('users/TA', userFound)
+      }else if(userFound.role === "Dev"){
+        res.render('users/Dev', userFound)
+      }else if(userFound.role === "Boss"){
+        res.render('users/Boss', userFound)
+      }
+
+    
     })
     .catch(() => {
       next()
