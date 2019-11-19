@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const users = require("../models/User");
 
-const localStrategy = require("passport-local").Strategy;
+
 const ensureLogin = require("connect-ensure-login");
 
 /* GET home page */
